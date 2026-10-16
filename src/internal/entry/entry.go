@@ -43,7 +43,7 @@ type Entry struct {
 	// feed does not provide it.
 	Published time.Time `yaml:"published" json:"published"`
 	// Updated is the last modification time reported by the feed.
-	Updated time.Time `yaml:"updated,omitempty" json:"updated,omitempty"`
+	Updated time.Time `yaml:"updated,omitempty" json:"updated,omitzero"`
 	// Fetched is the time the entry was first saved by the application.
 	Fetched time.Time `yaml:"fetched" json:"fetched"`
 	// Categories (tags) reported by the feed.

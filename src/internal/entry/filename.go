@@ -21,11 +21,17 @@ const fileExt = ".md"
 // from entry IDs, so the same entry always maps to the same file name.
 var uuidNamespace = uuid.MustParse("6f1c5a52-6f0e-4c1e-9a43-3d0c8a1b7e21")
 
+// signsRemover deletes Cyrillic soft and hard signs before transliteration.
+var signsRemover = strings.NewReplacer("ь", "", "Ь", "", "ъ", "", "Ъ", "")
+
 // Slug converts a title into a lowercase ASCII slug using transliteration
 // (e.g. Cyrillic is converted to Latin). The result is limited to
 // maxSlugLen characters and may be empty if the title has no
 // transliterable characters.
 func Slug(title string) string {
+	// Soft and hard signs are transliterated to apostrophes, which the
+	// slug library turns into separators ("bor-ba"); drop them instead.
+	title = signsRemover.Replace(title)
 	s := slug.Make(title)
 	if len(s) <= maxSlugLen {
 		return s

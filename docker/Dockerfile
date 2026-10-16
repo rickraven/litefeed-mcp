@@ -1,5 +1,5 @@
 # Build stage: compile a static binary (CGO disabled, pure-Go dependencies only).
-FROM golang:1.25-alpine AS build
+FROM golang:1.26-alpine AS build
 WORKDIR /src
 COPY src/go.mod src/go.sum ./
 RUN go mod download

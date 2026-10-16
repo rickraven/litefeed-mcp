@@ -41,6 +41,7 @@ func TestSlug(t *testing.T) {
 	cases := map[string]string{
 		"New version: Kubernetes 1.34!": "new-version-kubernetes-1-34",
 		"Новая версия Kubernetes":       "novaia-versiia-kubernetes",
+		"Борьба с подъёмом":             "borba-s-podiomom",
 		"🔥🔥🔥":                           "",
 	}
 	for in, want := range cases {
