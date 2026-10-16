@@ -34,7 +34,13 @@ var version = "dev"
 func main() {
 	configPath := flag.String("config", "config.yaml", "path to the YAML configuration file")
 	debug := flag.Bool("debug", false, "enable debug logging")
+	showVersion := flag.Bool("version", false, "print the version and exit")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println("litefeed-mcp", version)
+		return
+	}
 
 	level := slog.LevelInfo
 	if *debug {

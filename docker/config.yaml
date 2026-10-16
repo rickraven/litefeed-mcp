@@ -1,0 +1,26 @@
+# Default configuration of the Docker image. Mount your own file over
+# /etc/litefeed/config.yaml to change it. All data is kept in /data.
+
+server:
+  listen: 0.0.0.0
+  port: 8080
+
+scrape:
+  interval: 30m
+  timeout: 30s
+  user_agent: "Mozilla/5.0 (compatible; litefeed-mcp/1.0)"
+
+storage:
+  type: sqlite
+  sqlite:
+    path: /data/litefeed.db
+  markdown:
+    dir: /data/feeds
+
+retention:
+  max_age_days: 30
+
+feeds:
+  - name: go-blog
+    title: Go Blog
+    url: https://go.dev/blog/feed.atom
