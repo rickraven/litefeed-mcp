@@ -19,11 +19,17 @@ import (
 
 	"litefeed-mcp/internal/api"
 	"litefeed-mcp/internal/config"
+	"litefeed-mcp/internal/mcpserver"
 	"litefeed-mcp/internal/scraper"
 	"litefeed-mcp/internal/storage"
 	"litefeed-mcp/internal/storage/markdown"
 	"litefeed-mcp/internal/storage/sqlite"
+	"litefeed-mcp/internal/web"
 )
+
+// version is reported to MCP clients; set at build time with
+// -ldflags "-X main.version=...".
+var version = "dev"
 
 func main() {
 	configPath := flag.String("config", "config.yaml", "path to the YAML configuration file")
@@ -75,7 +81,8 @@ func run(configPath string) error {
 
 	mux := http.NewServeMux()
 	api.New(store, cfg.Feeds).Register(mux)
-	// TODO: register the web UI and the MCP endpoint.
+	web.New(store).Register(mux)
+	mux.Handle("/mcp", mcpserver.Handler(store, cfg.Feeds, version))
 
 	srv := &http.Server{
 		Addr:              cfg.Server.Addr(),

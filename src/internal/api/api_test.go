@@ -113,6 +113,7 @@ func TestEntriesFilters(t *testing.T) {
 		{"/api/entries?feed=a", "entry 1,entry 0", false},
 		{"/api/entries?feed=a,b&limit=4", "entry 3,entry 2,entry 1,entry 0", false},
 		{"/api/entries?since=2026-10-16T00:00:00Z&until=2026-10-16T12:00:00Z", "entry 2,entry 1", false},
+		{"/api/entries?q=ENTRY+2", "entry 2", false},
 	}
 	for _, c := range cases {
 		var l rawList

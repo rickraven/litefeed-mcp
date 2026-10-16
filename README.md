@@ -1,6 +1,44 @@
 # litefeed-mcp
 Lightweight RSS feed reader with WEB UI and builtin MCP server
 
+## Web UI
+
+The web interface is served at `/`. It is a single page without external
+dependencies, embedded into the binary.
+
+- The feed is loaded day by day while scrolling, in the browser's time zone.
+  Days without entries are skipped.
+- The **Feeds** menu selects which feeds are shown (all by default). The
+  selection is stored in the browser.
+- The theme follows the system setting by default and can be switched to
+  light or dark with the button in the top bar.
+- **Read here** shows the stored article body inline. The title opens the
+  original article. Raw HTML from feeds is never rendered.
+
+## MCP
+
+The MCP endpoint is served at `/mcp` using the Streamable HTTP transport
+(stateless). Example client configuration:
+
+```json
+{
+  "mcpServers": {
+    "litefeed": { "url": "http://localhost:8080/mcp" }
+  }
+}
+```
+
+All tools are read-only:
+
+| Tool             | Description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| `list_feeds`     | Configured feeds (`name`, `title`, `url`)                                   |
+| `search_entries` | Brief entries, newest first. Filters: `feeds`, `query`, `since`, `until`, `limit` (default 20, max 100) |
+| `get_entry`      | One entry with the full markdown body, by `id`                              |
+
+`since` and `until` accept `YYYY-MM-DD` (UTC, `until` includes the whole day)
+or RFC3339 timestamps. `query` works like the REST API `q` parameter.
+
 ## REST API
 
 All endpoints are read-only and return JSON. Errors are returned as
@@ -22,6 +60,7 @@ All endpoints are read-only and return JSON. Errors are returned as
 - `until` — RFC3339 time, entries published before it.
 - `day` — `YYYY-MM-DD`, entries of one calendar day. Cannot be combined with `since`/`until`.
 - `tz` — IANA time zone used to interpret `day`, e.g. `Europe/Moscow`. Default: `UTC`.
+- `q` — text search: every word must occur (case-insensitive) in the title, author, categories, summary or body.
 - `limit` — maximum number of entries, 1–1000. Default: 100.
 
 Entries are ordered by publication time, newest first. Response:

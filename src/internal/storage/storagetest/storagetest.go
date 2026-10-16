@@ -122,6 +122,10 @@ func testList(t *testing.T, newStore Factory) {
 		{storage.Query{Feeds: []string{"a", "b"}}, "three,two,one"},
 		{storage.Query{Since: day(15, 0), Until: day(16, 0)}, "two"},
 		{storage.Query{Feeds: []string{"none"}}, ""},
+		{storage.Query{Text: "THREE"}, "three"},
+		{storage.Query{Text: "text  rule", Limit: 3}, "four,three,two"},
+		{storage.Query{Text: "three four"}, ""},
+		{storage.Query{Text: "rss", Feeds: []string{"a"}}, "two,one"},
 	}
 	for _, c := range cases {
 		list, err := s.List(ctx, c.q)

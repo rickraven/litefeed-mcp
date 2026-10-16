@@ -21,6 +21,9 @@ type Result struct {
 	// Old is the number of items ignored because they were published
 	// before the retention cutoff.
 	Old int
+	// FullTextFailed is the number of new entries saved with the feed
+	// content because the full text could not be extracted.
+	FullTextFailed int
 }
 
 // ScrapeFeed downloads one feed and saves its new items. Items that fail
@@ -53,6 +56,23 @@ func ScrapeFeed(ctx context.Context, f *Fetcher, store storage.Store, feed confi
 		if !cutoff.IsZero() && e.Published.Before(cutoff) {
 			res.Old++
 			continue
+		}
+		if feed.FullText {
+			// The page is downloaded only for new entries: existing ones
+			// are deduplicated by Save anyway, and refetching every page on
+			// every cycle would be wasteful and impolite to the site.
+			exists, err := store.Has(ctx, e.ID)
+			if err != nil {
+				return res, fmt.Errorf("check entry: %w", err)
+			}
+			if exists {
+				continue
+			}
+			if err := enrichWithFullText(ctx, f, e); err != nil {
+				slog.Warn("full text download failed, keeping feed content",
+					"feed", feed.Name, "link", e.Link, "err", err)
+				res.FullTextFailed++
+			}
 		}
 		saved, err := store.Save(ctx, e)
 		if err != nil {

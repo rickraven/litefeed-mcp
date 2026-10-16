@@ -81,7 +81,8 @@ func (s *Scheduler) RunOnce(ctx context.Context) {
 				return
 			}
 			slog.Debug("feed scraped", "feed", feed.Name, "items", res.Items,
-				"saved", res.Saved, "skipped", res.Skipped, "old", res.Old)
+				"saved", res.Saved, "skipped", res.Skipped, "old", res.Old,
+				"full_text_failed", res.FullTextFailed)
 			mu.Lock()
 			saved += res.Saved
 			mu.Unlock()

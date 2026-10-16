@@ -184,7 +184,10 @@ func (s *Store) List(ctx context.Context, q storage.Query) ([]entry.Entry, error
 	}
 	// ID is a tie breaker for a stable order, same as the markdown backend.
 	query += ` ORDER BY published DESC, id ASC`
-	if q.Limit > 0 {
+	// With a text filter rows are matched in Go (see entry.Entry.Matches),
+	// so the limit is applied while scanning instead of in SQL.
+	terms := entry.SearchTerms(q.Text)
+	if q.Limit > 0 && len(terms) == 0 {
 		query += ` LIMIT ?`
 		args = append(args, q.Limit)
 	}
@@ -201,7 +204,13 @@ func (s *Store) List(ctx context.Context, q storage.Query) ([]entry.Entry, error
 		if err != nil {
 			return nil, err
 		}
+		if !e.Matches(terms) {
+			continue
+		}
 		out = append(out, *e)
+		if q.Limit > 0 && len(out) >= q.Limit {
+			break
+		}
 	}
 	return out, rows.Err()
 }

@@ -21,6 +21,10 @@ type Query struct {
 	Since time.Time
 	// Until includes entries published strictly before this time.
 	Until time.Time
+	// Text is a full text filter: every whitespace separated term must
+	// occur (case-insensitively) in the title, author, categories, summary
+	// or content. See entry.Entry.Matches.
+	Text string
 	// Limit caps the number of returned entries.
 	Limit int
 }

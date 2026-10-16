@@ -136,7 +136,9 @@ func list[T any](a *API, w http.ResponseWriter, r *http.Request, view func(*entr
 
 	if p.loc != nil {
 		resp.Day = p.query.Since.In(p.loc).Format(dayLayout)
-		prev, err := a.store.List(ctx, storage.Query{Feeds: p.query.Feeds, Until: p.query.Since, Limit: 1})
+		prev, err := a.store.List(ctx, storage.Query{
+			Feeds: p.query.Feeds, Text: p.query.Text, Until: p.query.Since, Limit: 1,
+		})
 		if err != nil {
 			internalError(w, r, err)
 			return
@@ -163,9 +165,11 @@ type listParams struct {
 //	until  RFC3339 time, exclusive upper bound of publication time
 //	day    YYYY-MM-DD; selects one calendar day (excludes since/until)
 //	tz     IANA time zone for "day", e.g. Europe/Moscow (default UTC)
+//	q      text search: all words must occur (case-insensitive)
 //	limit  maximum number of entries (default 100, max 1000)
 func (a *API) parseListParams(v url.Values) (listParams, error) {
 	p := listParams{limit: defaultLimit}
+	p.query.Text = v.Get("q")
 
 	for _, raw := range v["feed"] {
 		for name := range strings.SplitSeq(raw, ",") {

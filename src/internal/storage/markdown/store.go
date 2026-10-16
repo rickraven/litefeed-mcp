@@ -182,7 +182,8 @@ func (s *Store) Get(_ context.Context, id string) (*entry.Entry, error) {
 }
 
 // List returns entries matching the query, newest first. Filtering and
-// sorting happen on the index; only the selected files are read.
+// sorting happen on the index; only the selected files are read. A text
+// filter requires reading candidate files until the limit is reached.
 func (s *Store) List(ctx context.Context, q storage.Query) ([]entry.Entry, error) {
 	s.mu.RLock()
 	items := make([]*indexItem, 0, len(s.index))
@@ -200,12 +201,16 @@ func (s *Store) List(ctx context.Context, q storage.Query) ([]entry.Entry, error
 		}
 		return strings.Compare(a.id, b.id)
 	})
-	if q.Limit > 0 && len(items) > q.Limit {
+	terms := entry.SearchTerms(q.Text)
+	if len(terms) == 0 && q.Limit > 0 && len(items) > q.Limit {
 		items = items[:q.Limit]
 	}
 
-	out := make([]entry.Entry, 0, len(items))
+	var out []entry.Entry
 	for _, it := range items {
+		if q.Limit > 0 && len(out) >= q.Limit {
+			break
+		}
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
@@ -216,7 +221,9 @@ func (s *Store) List(ctx context.Context, q storage.Query) ([]entry.Entry, error
 			slog.Warn("failed to read entry file", "path", it.path, "err", err)
 			continue
 		}
-		out = append(out, *e)
+		if e.Matches(terms) {
+			out = append(out, *e)
+		}
 	}
 	return out, nil
 }
