@@ -1,0 +1,30 @@
+# HTTP listener for the web UI, REST API and MCP endpoint.
+server:
+  listen: 0.0.0.0
+  port: 8080
+
+# Feed polling settings.
+scrape:
+  interval: 30m       # how often all feeds are polled (minimum 1m)
+  timeout: 30s        # timeout for a single HTTP request
+  user_agent: "Mozilla/5.0 (compatible; litefeed-mcp/1.0)"
+
+# Storage backend: "sqlite" or "markdown".
+storage:
+  type: sqlite
+  sqlite:
+    path: data/litefeed.db
+  markdown:
+    dir: data/feeds   # each feed gets its own subdirectory
+
+# Removal of old entries.
+retention:
+  max_age_days: 30    # 0 disables cleanup
+
+# List of feeds. "name" is used as directory name and API identifier
+# (lowercase letters, digits, "-" and "_").
+feeds:
+  - name: habr
+    title: Habr
+    url: https://habr.com/ru/rss/all/all/
+    full_text: false  # download and extract the full article text
