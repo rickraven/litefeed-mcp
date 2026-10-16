@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>litefeed</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/app.css">
+  <!-- Applies the saved theme before the first paint to avoid flicker. -->
+  <script src="/static/theme.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">litefeed</a>
+      <div class="actions">
+        <button id="feeds-toggle" class="btn" type="button" aria-expanded="false" aria-controls="feeds-panel">
+          Feeds <span id="feeds-count" class="badge"></span>
+        </button>
+        <button id="theme-toggle" class="btn icon" type="button"></button>
+      </div>
+    </div>
+    <div id="feeds-panel" class="feeds-panel" hidden>
+      <div class="feeds-panel-inner">
+        <div class="feeds-tools">
+          <button id="feeds-all" class="link" type="button">Select all</button>
+          <button id="feeds-none" class="link" type="button">Clear</button>
+        </div>
+        <ul id="feeds-list" class="feeds-list"></ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="list"></div>
+    <div id="status" class="status" aria-live="polite"></div>
+    <div id="sentinel"></div>
+  </main>
+
+  <template id="tpl-day">
+    <section class="day">
+      <h2 class="day-title"></h2>
+      <div class="day-entries"></div>
+    </section>
+  </template>
+
+  <template id="tpl-entry">
+    <article class="entry">
+      <div class="meta">
+        <span class="feed"></span>
+        <time class="time"></time>
+        <span class="author"></span>
+      </div>
+      <h3 class="title"><a target="_blank" rel="noopener noreferrer"></a></h3>
+      <p class="summary"></p>
+      <div class="content" hidden></div>
+      <button class="link expand" type="button">Read here</button>
+    </article>
+  </template>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
